@@ -33,17 +33,17 @@ void hqm_init(char *key_string, int enable_debug, int enable_background_tasks) {
 
     // enabling debug
     jmethodID hqsdk_enable_debug = env->GetStaticMethodID(hqsdk_class, "enableDebug",
-                                                             "(Z)V");
+                                                          "(Z)V");
     env->CallStaticVoidMethod(hqsdk_class, hqsdk_enable_debug,
-                                 (jboolean) (enable_debug == JNI_TRUE));
+                              (jboolean) (enable_debug == JNI_TRUE));
 
     // initing sdk
     jmethodID sdk_init_method = env->GetStaticMethodID(hqsdk_class, "init",
-                                                          "(Landroid/content/Context;Ljava/lang/String;ZZ)V");
+                                                       "(Landroid/content/Context;Ljava/lang/String;ZZ)V");
     env->CallStaticVoidMethod(hqsdk_class, sdk_init_method, activity,
-                                 env->NewStringUTF(key_string),
-                                 (jboolean) (enable_background_tasks == JNI_FALSE),
-                                 (jboolean) (enable_debug == JNI_TRUE)
+                              env->NewStringUTF(key_string),
+                              (jboolean) (enable_background_tasks == JNI_FALSE),
+                              (jboolean) (enable_debug == JNI_TRUE)
     );
 
     env->DeleteLocalRef(activity);
@@ -58,17 +58,15 @@ void hqm_init(char *key_string, int enable_debug, int enable_background_tasks) {
 void hqm_collect_apps() {
     JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
     jobject activity = (jobject) SDL_AndroidGetActivity();
-    jclass activity_class = env->GetObjectClass(activity);
 
     jclass hqsdk_class = env->FindClass(HQM_CLASS);
 
     // collect installed apps
     jmethodID collect_apps_method = env->GetStaticMethodID(hqsdk_class, "collectApps",
-                                                              "(Landroid/content/Context;)V");
+                                                           "(Landroid/content/Context;)V");
     env->CallStaticVoidMethod(hqsdk_class, collect_apps_method, activity);
 
     env->DeleteLocalRef(activity);
-    env->DeleteLocalRef(activity_class);
     env->DeleteLocalRef(hqsdk_class);
 }
 
@@ -88,10 +86,10 @@ void hqm_log(char *event_name, char *event_data) {
 
     // log event
     jmethodID log_event_method = env->GetStaticMethodID(hqsdk_class, "logEvent",
-                                                           "(Ljava/lang/String;Ljava/lang/String;)V");
+                                                        "(Ljava/lang/String;Ljava/lang/String;)V");
     env->CallStaticVoidMethod(hqsdk_class, log_event_method,
-                                 env->NewStringUTF(event_name),
-                                 env->NewStringUTF(event_data));
+                              env->NewStringUTF(event_name),
+                              env->NewStringUTF(event_data));
 
     env->DeleteLocalRef(hqsdk_class);
 }
@@ -120,12 +118,13 @@ UserGroupData hqm_get_user_groups() {
     jclass hqsdk_class = env->FindClass(HQM_CLASS);
     jclass list_class = env->FindClass(LIST_CLASS);
     jclass gr_class = env->FindClass(GROUP_RESPONSE_CLASS);
+    jobject activity = (jobject) SDL_AndroidGetActivity();
 
     // get user groups
     jmethodID user_groups_method = env->GetStaticMethodID(hqsdk_class,
-                                                             "getUserGroupsSync",
-                                                             "()Ljava/util/List;");
-    jobject groups = env->CallStaticObjectMethod(hqsdk_class, user_groups_method);
+                                                          "getUserGroupsSync",
+                                                          "(Landroid/content/Context;)Ljava/util/List;");
+    jobject groups = env->CallStaticObjectMethod(hqsdk_class, user_groups_method, activity);
 
     if(groups == NULL) return (struct _UserGroupData) {.length = 0, .userGroups = NULL};
 
@@ -144,7 +143,7 @@ UserGroupData hqm_get_user_groups() {
 
     // Get segment_name field
     jfieldID segNameFieldID = env->GetFieldID(gr_class, "segment_name",
-                                                 "Ljava/lang/String;");
+                                              "Ljava/lang/String;");
 
     UserGroup userGroups[listItemsCount];
 
@@ -170,6 +169,7 @@ UserGroupData hqm_get_user_groups() {
         }
     }
 
+    env->DeleteLocalRef(activity);
     env->DeleteLocalRef(hqsdk_class);
     env->DeleteLocalRef(list_class);
     env->DeleteLocalRef(gr_class);

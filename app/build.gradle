@@ -38,6 +38,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    implementation 'io.humanteq.hqsdk:hqsdk-core-legacy:1.2.2-beta01'
-    implementation 'io.humanteq.hqsdk:hqsdk-apps-legacy:1.2.2-alpha09'
+    implementation 'io.humanteq.hqsdk:hqsdk-core-legacy:1.2.4-alpha02'
+    implementation 'io.humanteq.hqsdk:hqsdk-apps-legacy:1.2.4-alpha02'
 }
