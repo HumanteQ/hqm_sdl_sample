@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "29.0.0"
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "io.humanteq.test_package"
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -38,6 +38,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    implementation 'io.humanteq.hqsdk:hqsdk-core-legacy:1.2.4-alpha02'
-    implementation 'io.humanteq.hqsdk:hqsdk-apps-legacy:1.2.4-alpha02'
+    implementation 'io.humanteq.hqm:hqm-core-legacy:2.0.0-alpha05-fix2'
 }

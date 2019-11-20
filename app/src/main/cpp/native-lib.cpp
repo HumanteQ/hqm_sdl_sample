@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include "hqm.h"
 
-#define DELAY (200)
+#define DELAY (150)
 
 int request_user_groups(TTF_Font *font, SDL_Renderer *renderer);
 
@@ -86,29 +86,29 @@ void start_hqm(TTF_Font *font, SDL_Renderer *renderer) {
     // init
     hqm_init(
             "38e44d7", // sdk key
-            1,         // enable debug mode
-            1);        // allow background tasks
+            1);         // enable debug mode
+
     renderText(font, 0, 0, "Initializing HQM SDK: OK", renderer);
 
     SDL_Delay(DELAY);
 
     renderText(font, 0, 50, "Starting apps collector: ...", renderer);
-    // collect apps
-    hqm_collect_apps();
+    // start sdk
+    hqm_start();
     renderText(font, 0, 50, "Starting apps collector: OK", renderer);
 
     SDL_Delay(DELAY);
 
     renderText(font, 0, 100, "Logging event 1: ...", renderer);
     // log event 1
-    hqm_log("test", "just a string");
+    hqm_log("test_event", "just a string");
     renderText(font, 0, 100, "Logging event 1: OK", renderer);
 
     SDL_Delay(DELAY);
 
     renderText(font, 0, 150, "Logging event 2: ...", renderer);
     // log event 2
-    hqm_log("test", "{\"text\": \"sdl_test\", \"event\": \"app_start\"}");
+    hqm_log("test_event", "{\"text\": \"sdl_test\", \"event\": \"app_start\"}");
     renderText(font, 0, 150, "Logging event 2: OK", renderer);
 
     SDL_Delay(DELAY);
@@ -127,8 +127,8 @@ int request_user_groups(TTF_Font *font, SDL_Renderer *renderer) {
         if (hqm_group_data.length == 0)
             renderText(font, 0, group_y_position += 50, "empty", renderer);
 
+        char buf[256] = {0};
         for (int i = 0; i < hqm_group_data.length; i++, hqm_group_data.userGroups++) {
-            char buf[256] = {0};
             snprintf(buf, sizeof(buf), "id:\"%s\" name:\"%s\"",
                      hqm_group_data.userGroups->id,
                      hqm_group_data.userGroups->name);

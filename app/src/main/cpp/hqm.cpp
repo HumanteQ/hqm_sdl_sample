@@ -1,10 +1,7 @@
 #include "SDL.h"
 #include <jni.h>
+#include <android/log.h>
 #include "hqm.h"
-
-#define HQM_CLASS               "io/humanteq/hqsdk_core_legacy/HQSdk"
-#define LIST_CLASS              "java/util/ArrayList"
-#define GROUP_RESPONSE_CLASS    "io/humanteq/hqsdk_core_legacy/models/GroupResponse"
 
 const char *_getString(JNIEnv *env, jobject idString) {
     const char *str = env->GetStringUTFChars((jstring) idString, 0);
@@ -25,24 +22,17 @@ const char *_getString(JNIEnv *env, jobject idString) {
  * @enable_debug             - enable/disable debug mode.
  * @enable_background_tasks  - allow sdk jobs to run in background.
  */
-void hqm_init(char *key_string, int enable_debug, int enable_background_tasks) {
-    JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
-    jobject activity = (jobject) SDL_AndroidGetActivity();
+void hqm_init(char *key_string, int enable_debug) {
+    auto *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+    auto activity = (jobject) SDL_AndroidGetActivity();
     jclass activity_class = env->GetObjectClass(activity);
     jclass hqsdk_class = env->FindClass(HQM_CLASS);
 
-    // enabling debug
-    jmethodID hqsdk_enable_debug = env->GetStaticMethodID(hqsdk_class, "enableDebug",
-                                                          "(Z)V");
-    env->CallStaticVoidMethod(hqsdk_class, hqsdk_enable_debug,
-                              (jboolean) (enable_debug == JNI_TRUE));
-
     // initing sdk
     jmethodID sdk_init_method = env->GetStaticMethodID(hqsdk_class, "init",
-                                                       "(Landroid/content/Context;Ljava/lang/String;ZZ)V");
+                                                       "(Landroid/content/Context;Ljava/lang/String;Z)V");
     env->CallStaticVoidMethod(hqsdk_class, sdk_init_method, activity,
                               env->NewStringUTF(key_string),
-                              (jboolean) (enable_background_tasks == JNI_FALSE),
                               (jboolean) (enable_debug == JNI_TRUE)
     );
 
@@ -55,14 +45,14 @@ void hqm_init(char *key_string, int enable_debug, int enable_background_tasks) {
  * Asynchronously schedules installed apps collector.
  * If enable_background_tasks == 0 asynchronously collects installed apps only once per call.
  */
-void hqm_collect_apps() {
-    JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
-    jobject activity = (jobject) SDL_AndroidGetActivity();
+void hqm_start() {
+    auto *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+    auto activity = (jobject) SDL_AndroidGetActivity();
 
     jclass hqsdk_class = env->FindClass(HQM_CLASS);
 
     // collect installed apps
-    jmethodID collect_apps_method = env->GetStaticMethodID(hqsdk_class, "collectApps",
+    jmethodID collect_apps_method = env->GetStaticMethodID(hqsdk_class, "start",
                                                            "(Landroid/content/Context;)V");
     env->CallStaticVoidMethod(hqsdk_class, collect_apps_method, activity);
 
@@ -80,7 +70,7 @@ void hqm_collect_apps() {
  * @param event_data
  */
 void hqm_log(char *event_name, char *event_data) {
-    JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+    auto *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
 
     jclass hqsdk_class = env->FindClass(HQM_CLASS);
 
@@ -113,12 +103,12 @@ void hqm_log(char *event_name, char *event_data) {
  * @return - a @UserGroupData struct representing a UserGroup list.
  */
 UserGroupData hqm_get_user_groups() {
-    JNIEnv *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+    auto *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
 
     jclass hqsdk_class = env->FindClass(HQM_CLASS);
     jclass list_class = env->FindClass(LIST_CLASS);
     jclass gr_class = env->FindClass(GROUP_RESPONSE_CLASS);
-    jobject activity = (jobject) SDL_AndroidGetActivity();
+    auto activity = (jobject) SDL_AndroidGetActivity();
 
     // get user groups
     jmethodID user_groups_method = env->GetStaticMethodID(hqsdk_class,
@@ -126,7 +116,7 @@ UserGroupData hqm_get_user_groups() {
                                                           "(Landroid/content/Context;)Ljava/util/List;");
     jobject groups = env->CallStaticObjectMethod(hqsdk_class, user_groups_method, activity);
 
-    if(groups == NULL) return (struct _UserGroupData) {.length = 0, .userGroups = NULL};
+    if (groups == nullptr) return (UserGroupData) {.length = 0, .userGroups = nullptr};
 
 
     // Get "java.util.List.get(int location)" MethodID
@@ -145,13 +135,12 @@ UserGroupData hqm_get_user_groups() {
     jfieldID segNameFieldID = env->GetFieldID(gr_class, "segment_name",
                                               "Ljava/lang/String;");
 
-    UserGroup userGroups[listItemsCount];
-
+    UserGroup *userGroups = static_cast<UserGroup *>(malloc(listItemsCount * sizeof *userGroups));
     for (int i = 0; i < listItemsCount; i++) {
         // get UserGroup item by index
         jobject groupObject = env->CallObjectMethod(groups, getMethodID, i);
 
-        if (groupObject != NULL) {
+        if (groupObject != nullptr) {
             jobject idObject = env->GetObjectField(groupObject, segIdFieldID);
             jobject nameObject = env->GetObjectField(groupObject, segNameFieldID);
 
@@ -159,13 +148,18 @@ UserGroupData hqm_get_user_groups() {
             const char *strId = _getString(env, idObject);
             const char *strName = _getString(env, nameObject);
 
-            userGroups[i] = (struct _UserGroup) {strId, strName};
+            userGroups[i].id = (char *) malloc(strlen(strId) + 1);
+            strncpy(userGroups[i].id, strId, strlen(strId));
+
+            userGroups[i].name = (char *) malloc(strlen(strName) + 1);
+            strncpy(userGroups[i].name, strName, strlen(strName));
 
             env->DeleteLocalRef(groupObject);
             env->DeleteLocalRef(idObject);
             env->DeleteLocalRef(nameObject);
         } else {
-            userGroups[i] = (struct _UserGroup) {"\0", "\0"};
+            userGroups[i].id = nullptr;
+            userGroups[i].name = nullptr;
         }
     }
 

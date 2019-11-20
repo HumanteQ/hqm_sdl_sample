@@ -1,19 +1,26 @@
 #ifndef SDL2_HQM_TEST_HQM_H
 #define SDL2_HQM_TEST_HQM_H
 
+#define HQM_CLASS               "io/humanteq/hq_core/HQSdk"
+#define LIST_CLASS              "java/util/ArrayList"
+#define GROUP_RESPONSE_CLASS    "io/humanteq/hq_core/models/UserGroup"
+
 typedef struct _UserGroup {
-    const char *id;
-    const char *name;
+    char *id;
+    char *name;
 } UserGroup;
 
 typedef struct _UserGroupData {
-    const UserGroup *userGroups;
+    UserGroup *userGroups;
     const int length;
 } UserGroupData;
 
-void hqm_init(char *key_string, int enable_debug, int enable_background_tasks);
-void hqm_collect_apps();
+void hqm_init(char *key_string, int enable_debug);
+
+void hqm_start();
+
 void hqm_log(char *event_name, char *event_data);
+
 UserGroupData hqm_get_user_groups();
 
 
