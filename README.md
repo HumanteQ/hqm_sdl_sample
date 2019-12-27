@@ -5,7 +5,7 @@
 #### Integration instructions:
 
  1. Add [hqm.h](https://raw.githubusercontent.com/HumanteQ/hqm_sdl_sample/master/app/src/main/cpp/hqm.h) and [hqm.cpp](https://raw.githubusercontent.com/HumanteQ/hqm_sdl_sample/master/app/src/main/cpp/hqm.cpp) into your project.
- 2. Add HQM repo into /your_project/build.gradle:
+ 2. Add HQM repo into `/your_project/build.gradle`:
 ```clojure
 
     allprojects {
@@ -20,7 +20,7 @@
         }
     }
 ```
- 3. Add HQM dependency into /your_project/app/build.gradle:
+ 3. Add HQM dependency into `/your_project/app/build.gradle`:
 ```clojure
 
     dependencies {
