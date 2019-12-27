@@ -1,6 +1,7 @@
 #include "SDL.h"
 #include <jni.h>
 #include <android/log.h>
+#include <string>
 #include "hqm.h"
 
 const char *_getString(JNIEnv *env, jobject idString) {
@@ -171,4 +172,59 @@ UserGroupData hqm_get_user_groups() {
 
     UserGroupData userGroupData = {.length = listItemsCount, .userGroups = userGroups};
     return userGroupData;
+}
+
+/**
+ * Request user data.
+ */
+void hqm_request_user_data(char *email) {
+    auto *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+
+    jclass hqsdk_class = env->FindClass(HQM_CLASS);
+
+    // request user data
+    jmethodID request_user_data_method = env->GetStaticMethodID(hqsdk_class, "requestUserData",
+                                                                "(Ljava/lang/String;)V");
+    env->CallStaticVoidMethod(hqsdk_class, request_user_data_method,
+                              env->NewStringUTF(email));
+
+    env->DeleteLocalRef(hqsdk_class);
+}
+
+/**
+ * Delete user data.
+ */
+void hqm_delete_user_data() {
+    auto *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+
+    jclass hqsdk_class = env->FindClass(HQM_CLASS);
+
+    // request user data
+    jmethodID delete_user_data_method = env->GetStaticMethodID(hqsdk_class, "deleteUserData", "()V");
+    env->CallStaticVoidMethod(hqsdk_class, delete_user_data_method);
+
+    env->DeleteLocalRef(hqsdk_class);
+}
+
+/**
+ * Get user id.
+ */
+std::string hqm_get_uuid() {
+    auto *env = (JNIEnv *) SDL_AndroidGetJNIEnv();
+
+    jclass hqsdk_class = env->FindClass(HQM_CLASS);
+
+    // request user data
+    jmethodID get_uuid_method = env->GetStaticMethodID(hqsdk_class, "getUuid", "()Ljava/lang/String;");
+
+    jstring rv = (jstring) env->CallStaticObjectMethod(hqsdk_class, get_uuid_method);
+
+    if (rv == nullptr)
+        return "";
+
+    std::string data = env->GetStringUTFChars( rv, 0);
+
+    env->DeleteLocalRef(hqsdk_class);
+
+    return data;
 }

@@ -1,8 +1,8 @@
-[ ![Download](https://api.bintray.com/packages/humanteq/hqm-sdk/hqm-core-legacy/images/download.svg?version=2.0.0-alpha05-fix2) ](https://bintray.com/humanteq/hqm-sdk/hqm-core-legacy/2.0.0-alpha05-fix2/link)
+[ ![Download](https://api.bintray.com/packages/humanteq/hqm-sdk/hqm-core-legacy/images/download.svg) ](https://bintray.com/humanteq/hqm-sdk/hqm-core-legacy/_latestVersion)
 
-### HQMonitor SDL Sample App.
+## HQMonitor SDL Sample App.
 
-###### Integration instructions:
+#### Integration instructions:
 
  1. Add [hqm.h](https://raw.githubusercontent.com/HumanteQ/hqm_sdl_sample/master/app/src/main/cpp/hqm.h) and [hqm.cpp](https://raw.githubusercontent.com/HumanteQ/hqm_sdl_sample/master/app/src/main/cpp/hqm.cpp) into your project.
  2. Add HQM repo into /your_project/build.gradle:
@@ -28,7 +28,7 @@
         implementation "androidx.appcompat:appcompat:$appcompat_version" 
         ...
     
-        implementation 'io.humanteq.hqm:hqm-core-legacy:2.0.0-alpha05-fix2'
+        implementation 'io.humanteq.hqm:hqm-core-legacy:2.0.0'
     
         ...
     }
@@ -75,3 +75,17 @@
 ```
 
 Startup script example: [native-lib.cpp](https://github.com/HumanteQ/hqm_sdl_sample/blob/master/app/src/main/cpp/native-lib.cpp#L55)
+
+
+#### GDPR compliance.
+To comply with GDPR, we provide following user data management methods:
+1. Request for user data. 
+A report with current user data will be sent to the provided email.
+```c
+            hqm_request_user_data("some@email.org");
+```
+
+2. User data deletion request. All current user data will be deleted from Humanteq servers.
+```c
+            hqm_delete_user_data();
+```

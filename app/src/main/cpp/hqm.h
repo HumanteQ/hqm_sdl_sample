@@ -23,5 +23,11 @@ void hqm_log(char *event_name, char *event_data);
 
 UserGroupData hqm_get_user_groups();
 
+void hqm_request_user_data(char * email);
+
+void hqm_delete_user_data();
+
+std::string hqm_get_uuid();
+
 
 #endif //SDL2_HQM_TEST_HQM_H

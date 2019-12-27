@@ -113,12 +113,30 @@ void start_hqm(TTF_Font *font, SDL_Renderer *renderer) {
 
     SDL_Delay(DELAY);
 
+    renderText(font, 0, 200, "Requesting user data: ...", renderer);
+    hqm_request_user_data("some@email.org");
+    renderText(font, 0, 200, "Requesting user data: OK", renderer);
+
+    SDL_Delay(DELAY);
+
+    renderText(font, 0, 250, "Deleting user data: ...", renderer);
+    hqm_delete_user_data();
+    renderText(font, 0, 250, "Deleting user data: OK", renderer);
+
+    SDL_Delay(DELAY);
+
+    renderText(font, 0, 300, "User id: ...", renderer);
+    std::string uuid = hqm_get_uuid();
+    char buf[64] = {0};
+    snprintf(buf, sizeof(buf), "User id: \"%s\"", uuid.c_str());
+    renderText(font, 0, 300, buf, renderer);
+
     retryerYPos = request_user_groups(font, renderer) + 50;
 }
 
 int request_user_groups(TTF_Font *font, SDL_Renderer *renderer) {
-    renderText(font, 0, 200, "Requesting group data: ...", renderer);
-    int group_y_position = 250;
+    renderText(font, 0, 350, "Requesting group data: ...", renderer);
+    int group_y_position = 400;
     renderText(font, 0, group_y_position += 50, "================================", renderer);
 
     // get user groups
@@ -141,7 +159,7 @@ int request_user_groups(TTF_Font *font, SDL_Renderer *renderer) {
         renderText(font, 0, group_y_position += 50, "no data", renderer);
     }
 
-    renderText(font, 0, 200, "Requesting group data: OK", renderer);
+    renderText(font, 0, 350, "Requesting group data: OK", renderer);
 
     renderText(font, 0, group_y_position += 50, "================================", renderer);
 
