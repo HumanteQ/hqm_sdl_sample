@@ -28,7 +28,7 @@
         implementation "androidx.appcompat:appcompat:$appcompat_version" 
         ...
     
-        implementation 'io.humanteq.hqm:hqm-core-legacy:2.0.0'
+        implementation 'io.humanteq.hqm:hqm-core-legacy:2.0.1'
     
         ...
     }
